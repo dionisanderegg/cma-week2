@@ -15,8 +15,12 @@ wildschwein_BE <- st_as_sf(wildschwein_BE, coords = c("E", "N"), crs = 2056, rem
 
 ## Calculate the timelag between GPS fixes and store it as integer in "timelag" ####
 
+wildschwein_BE <- group_by(wildschwein_BE, TierID)
+
 wildschwein_BE$timelag <- as.integer(
   difftime(lead(wildschwein_BE$DatetimeUTC), wildschwein_BE$DatetimeUTC, units = "secs"))
+
+wildschwein_BE <- filter(wildschwein_BE, timelag >= 0)
 
 ## Data inspection ##############################################################
 unique(wildschwein_BE$TierID)   # 3 individuals were tracked
@@ -35,6 +39,7 @@ wildschwein_BE$timelag_round <- round(wildschwein_BE$timelag/100) *100
 wildschwein_BE_group <- wildschwein_BE %>%
   group_by(timelag_round) %>%
   summarise(n = n())
+View(arrange(wildschwein_BE_group, desc(n), ))
 
 #visuazlize original data as histogram (LOG-SCALE!)
 wildschwein_BE %>%
@@ -66,3 +71,7 @@ wildschwein_BE %>%
   geom_line () +
   theme_bw()
 # Plot shosw a large number of "long" timelags for Ruth from May 2015
+
+## Task 2 ########################################################################
+wildschwein_BE$steplength <- sqrt(  (wildschwein_BE$E - lead(wildschwein_BE$E))^2 + (wildschwein_BE$N - lead(wildschwein_BE$N))^2 )
+wildschwein_BE$speed_ms <- wildschwein_BE$steplength / wildschwein_BE$timelag
