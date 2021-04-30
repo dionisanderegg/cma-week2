@@ -17,8 +17,8 @@ wildschwein_BE <- st_as_sf(wildschwein_BE, coords = c("E", "N"), crs = 2056, rem
 
 wildschwein_BE <- group_by(wildschwein_BE, TierID)
 
-wildschwein_BE$timelag <- as.integer(
-  difftime(lead(wildschwein_BE$DatetimeUTC), wildschwein_BE$DatetimeUTC, units = "secs"))
+wildschwein_BE <- mutate(wildschwein_BE, timelag = as.integer(
+  difftime(lead(DatetimeUTC), DatetimeUTC, units = "secs")))
 
 wildschwein_BE <- filter(wildschwein_BE, timelag >= 0)
 
@@ -184,5 +184,3 @@ ggplot(caro60_speeds, aes(DatetimeUTC, speed_ms, col = k)) +
   geom_line() +
   theme_bw() +
   labs(title = "influence of window sizes on speed", x = "\nDatetimeUTC [hh:mm]", y ="speed in m/s\n" )
-
-
