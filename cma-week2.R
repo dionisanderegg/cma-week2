@@ -1,6 +1,6 @@
 ## Load the necessary libraries ################################################
 
-library(tidyverse)        # to import tabular data (e.g. csv)
+library(tidyverse)    # to import tabular data (e.g. csv)
 library(dplyr)        # to manipulate (tabular) data
 library(ggplot2)      # to visualize data
 library(sf)           # to handle spatial vector data
@@ -9,7 +9,7 @@ library(lubridate)    # To handle dates and times
 
 ## Import the downloaded csv ##################################################
 
-wildschwein_BE <- read_delim("wildschwein_BE_2056.csv",",") # adjust path
+wildschwein_BE <- read_delim("wildschwein_BE_2056.csv",",")
 
 wildschwein_BE <- st_as_sf(wildschwein_BE, coords = c("E", "N"), crs = 2056, remove = FALSE)
 
@@ -159,3 +159,30 @@ caro %>%
 ggplot(caro, aes(DatetimeUTC, speed_ms, col = Trajectory)) +
   geom_line() +
   geom_point()
+
+## Task 4 ###################################################################################
+# Smooth parameters with a moving window funcion
+library(zoo)
+
+example <- rnorm(10)
+example1 <- rollmean(example, k = 3, fill = NA, allign = "left")
+example2 <- rollmean(example, k = 4, fill = NA, allign = "left")
+example3 <- rollmean(example, k = 5, fill = NA, allign = "left")
+
+# Apply on speed of caro
+
+caro60$speed_ms_smooth03 <- rollmean(caro60$speed_ms, k = 3, fill = NA, allign = "left")
+caro60$speed_ms_smooth04 <- rollmean(caro60$speed_ms, k = 4, fill = NA, allign = "left")
+caro60$speed_ms_smooth06 <- rollmean(caro60$speed_ms, k = 6, fill = NA, allign = "left")
+caro60$speed_ms_smooth10 <- rollmean(caro60$speed_ms, k = 10, fill = NA, allign = "left")
+caro60$speed_ms_smooth15 <- rollmean(caro60$speed_ms, k = 15, fill = NA, allign = "left")
+caro60$speed_ms_smooth25 <- rollmean(caro60$speed_ms, k = 25, fill = NA, allign = "left")
+
+caro60_speeds <- gather(caro60, k, speed_ms, speed_ms : speed_ms_smooth25)
+
+ggplot(caro60_speeds, aes(DatetimeUTC, speed_ms, col = k)) +
+  geom_line() +
+  theme_bw() +
+  labs(title = "influence of window sizes on speed", x = "\nDatetimeUTC [hh:mm]", y ="speed in m/s\n" )
+
+
