@@ -78,12 +78,17 @@ wildschwein_BE %>%
 
 ## Task 2 ########################################################################
 # Calculate the euclidian distance and store it in "steplength"
-wildschwein_BE$steplength <- sqrt(
-  (wildschwein_BE$E - lead(wildschwein_BE$E))^2 + (wildschwein_BE$N - lead(wildschwein_BE$N))^2
-  )
+wildschwein_BE <- wildschwein_BE %>%
+  group_by(TierID) %>%
+  mutate(steplength = sqrt((E-lead(E))^2 + (N - lead(N))^2))
 
 # calculate the animals speed by distance and timelag and store it in speed_ms => meters per second
 wildschwein_BE$speed_ms <- wildschwein_BE$steplength / wildschwein_BE$timelag
+
+ggplot(wildschwein_BE, aes (DatetimeUTC, speed_ms, col = TierID)) +
+  geom_line() +
+  facet_wrap(~TierName, scales = "free_x")+
+  theme_bw()
 
 ## Task 3 #########################################################################
 # Read data and convert to sf
