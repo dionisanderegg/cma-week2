@@ -37,6 +37,7 @@ wildschwein_BE$timelag_round <- round(wildschwein_BE$timelag/100) *100
 
 #count timelags per 100s-category
 wildschwein_BE_group <- wildschwein_BE %>%
+  st_drop_geometry() %>%
   group_by(timelag_round) %>%
   summarise(n = n())
 
