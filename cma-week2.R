@@ -64,7 +64,8 @@ wildschwein_BE %>%
   ggplot(aes(DatetimeUTC, timelag, col = TierName)) +
   geom_point() +
   geom_line () +
-  theme_bw()
+  theme_bw() +
+  facet_wrap(~TierName)
 
 # Filter for timelags < 25000s
 wildschwein_BE %>%
